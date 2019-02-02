@@ -126,17 +126,36 @@
       <option name="presentableId" value="Default" />
       <updated>1548880683205</updated>
       <workItem from="1548880684613" duration="3729000" />
+<<<<<<< HEAD
+      <workItem from="1548956209812" duration="6101000" />
+=======
       <workItem from="1548956209812" duration="6063000" />
+<<<<<<< HEAD
       <workItem from="1549070768565" duration="3040000" />
+=======
+      <workItem from="1549070768565" duration="1029000" />
+>>>>>>> c7f7e7f9935248c200dc9be6244e64a814473113
+>>>>>>> 611ebf6f4b4a89d2b16ce22fd010571f89bfc841
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="12832000" />
+=======
+<<<<<<< HEAD
+    <option name="totallyTimeSpent" value="9830000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
+=======
+    <option name="totallyTimeSpent" value="10821000" />
+>>>>>>> 611ebf6f4b4a89d2b16ce22fd010571f89bfc841
   </component>
   <component name="ToolWindowManager">
     <frame x="12" y="272" width="931" height="800" extended-state="0" />
     <editor active="true" />
+>>>>>>> c7f7e7f9935248c200dc9be6244e64a814473113
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.24835165" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
