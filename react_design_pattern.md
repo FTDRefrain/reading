@@ -1,6 +1,6 @@
 ## 读书笔记-react设计模式
 1. 第三章，开发高可用的组件
-    1.  所有的绑定放到构造函数里面进行绑定，对性能好：主要的问题在于子组件的渲染上面，因为绑定的时候props要重新传一次；
+    1. 所有的绑定放到构造函数里面进行绑定，对性能好：主要的问题在于子组件的渲染上面，因为绑定的时候props要重新传一次；
     1. 无状态组件：
         1. 可以接受props,没有this也没有声明周期函数，可以使用ref但本身没有
         1. 没有声明周期，所以数据更新时候无法进行检测也就少一部分的优化
@@ -58,8 +58,26 @@
             
             ```
 1. 第五章，恰当的获取数据
-    1.         
-        
+    1. 例子如下
+        ```javascript
+           const withData = url => Component => (...)
+           const withGists = withData(
+               props => `https://api.github.com/users/${props.username}/gists`
+           )
+           // 下面是高阶组件里面的方法，因为有使用url参数的情况，所以通过和上面结合的方式对url部分使用props里面的值
+           componentDidMount() {
+                 const endpoint = typeof url === 'function'
+                   ? url(this.props)
+                   : url
+                 fetch(endpoint)
+                   .then(response => response.json())
+                   .then(data => this.setState({ data }))
+           }
+           // 之后在最外面的组件添加name就可以了
+           <ListWithGists username="gaearon" />
+        ```        
+    1. react-refetch库，可以进行上述同样的效果且更好，主要使用connect将数据和函数放在一起；  
+    还有pending和fulfilled两个状态可以监控数据获取阶段；    
         
         
         
