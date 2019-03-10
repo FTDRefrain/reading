@@ -1,0 +1,1 @@
+## 使用的时候就是编辑完成后进行预览，通过cmd+shift+p的方式调用markDownPreview进行  内容的观看
