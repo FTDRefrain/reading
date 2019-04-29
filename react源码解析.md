@@ -138,6 +138,9 @@
          - setState
          - forceUpdate
       2. hydrate和render的区别就是在于里面的第四个参数一个是true一个是false，因为hydrate用于SSR，里面的true表示是否要复用DOM节点，所以SSR的时候采用复用的方式会提高性能；
+      3. 对于render，会判断当前节点是否有子节点，如果有的话是要hydrate的；如果没有就直接删除整个root；构建了一个rooter（作用是创建fiberRooter对象），然后创建expireTime对象，update对象，然后放到root上面
+   2. fiberRoot
+      1. 拥有自己的数据结构
 
 
 
