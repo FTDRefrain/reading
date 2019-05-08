@@ -27,6 +27,68 @@
 
       2. Babel：JS编译器，通过.babelrc进行配置
 
+      3. `null >= 0`是true
+
+      4. []和null的type是object；
+
+      5. 关键字不能使用，同样也不能作为对象的方法被赋值和使用；
+
+      6. -不能使用，但是可以使用_，或者就是使用""将名字包裹起来；
+
+      7. 使用||和&&进行不存在值的避免；
+
+      8. for里面的in取的key，of取的是值；in无法控制出来内容的顺序；
+
+      9. 每个函数接受两个参数：this, argument；四种调用方式，不同的调用方式决定了this的差异
+
+         1. 方法调用，即在对象里面声明，这时候this指向声明的对象
+         2. 函数调用，并非对象的一个属性时，this指向全局，可以用变量接住this，表示正确的指向；
+         3. 构造器调用，即new的方式，指向新构建的对象；
+         4. apply方式，即第一个参数指定this指向方式；
+         5. argument进行隐世传递，本身是类数组，只用length没有其他的数组方法；
+
+      10. throw扔出的对象由外面的catch接住；
+
+      11. 尾递归，当函数返回自身递归调用的结果，过程可以通过循环去优化，但是js没有；
+
+      12. 模块模式，即通过闭包的方式解决一些全局变量的隐患，返回的是希望暴露的内容；因为闭包的东西可以访问但是不能修改；
+
+      13. 级联，即不断的调用方法，本身编写的时候方法返回的是this就可以了；
+
+      14. 柯里化，将复数参数转化为单参数函数进行调用，即将之前的参数通过闭包和argument联合都整合到一起；
+
+      15. new实现方法如下
+
+          ```javascript
+          Fuction.prototype.extends = function(){
+            var that = Object.create(this.prototype)
+            var others = this.apply(that, arguments)
+            //这里要返回一个对象
+            return typeof others === 'object' ? others : that
+          }
+          ```
+
+      16. 继承的话如下实现，即原型指向继承对象，自己写构造函数；
+
+          ```javascript
+          var Cons = function(x, y){
+          	this.x = x;
+            this.y = y
+          }
+          Cons.prototype = new Parents()
+          var children = new Cons
+          ```
+
+      17. 私有变量实现：即另外加一个that，将需要暴露的东西加到这个that里面，然后return出去而不是原来的that；
+
+      18. splice进行数组内容的删除，两个参数，一个是序号，一个是个数；
+
+      19. 数组本身也是对象，上面可以挂在方法且不会增加长度；
+
+      20. 数组的fill函数进行初始值的设定；
+
+      21. sort方法不能正确的排序，要自己设定；
+
    2. class和普通构造函数的区别
 
       1. 构造函数
@@ -121,6 +183,9 @@
       2. 原型的扩展性
 
          1. 上面的Jquery.fn是用来添加插件的，因为其他开发可以使用$.fn.addFunc来添加自己的方法，好处是只暴露了唯一变量​
+         2. _proto_：对象特有，指向上层的prototype，这样对象就可以继承了prototype中的属性和方法；
+         3. Prototype，函数特有的，用于存储共享的属性和方法；
+         4. Constructor，函数特有，定义在prototype里面；
 
 3. 异步
 
