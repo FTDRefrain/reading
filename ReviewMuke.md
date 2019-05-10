@@ -109,7 +109,166 @@
           - 默认值的实现，本身是惰性的，即当后面的内容不是undefined的时候就不会被执行，不管是函数还是未定义的变量；
           - 对象自然也可以进行赋值
 
-      30. 
+      30. 模板字符串中是可以使用函数的，即也可以进行嵌套；不是字符串会调用对象的toString方法；
+
+      31. 正则四个方法：match, replace, search, split；
+
+      32. 函数的length表示预传入参数的个数，意味着使用了默认值之后length会改变且尾参数没有给默认值的情况下，最后一个默认值之后的内容都不要；
+
+      33. 函数传参的地方有自己的作用域，且默认值可以是函数；能利用默认值抛出参数缺少的异常；
+
+      34. rest函数就是…args，一个有用的点就是合并参数，是展开…函数的逆运算，和展开不同的是展开后面可以补充其他内容，rest的合并后面不能再给值了，代码如下
+
+          ```javascript
+          const numbers = (...nums) => nums;
+          numbers(1,2,3,4) // [1,2,3,4]
+          ```
+
+      35. 箭头函数的this使用的是自己外层的this，自己本身没有this；
+
+      36. 尾调用优化：函数的调用要从另一个函数回来，这样就需要记录函数的内部变量，函数调用位置等，但是尾调用的时候，如果没有使用函数内部的变量，直接记录函数调用帧就行，调用完直接回到上层函数就行
+
+      37. 尾递归改写优化，优势就是不会发生栈溢出，代码实例如下
+
+          ```javascript
+          // 递归调用的时候要存上所有的n；
+          function factorial(n){
+            if(n === 1) return 1;
+            return n * factorial(n-1)
+          }
+          // 下面就是一个尾递归优化，因为本身没有依赖上次的变量
+          function facChange(n, total){
+            if(n === 1) return 1;
+            return facChange(n-1, n*total)
+          }
+          ```
+
+          再看下面的例子
+
+          ```javascript
+          function Fibonacci(n){
+            if(n <= 1) return 1;
+            return Fibonacci(n-1) + Fibonacci(n-2)
+          }
+          // 同样改写，将需要的变量传进去而不是写在外面；
+          function Fibo2(n, acc1=1, acc2=1){
+            if(n <= 1) return 1;
+            return Fibo2(n-1, acc2, acc1+acc2)
+          }
+          ```
+
+          递归优化只在严格模式下生效，正常模式下就要自己去做了；
+
+      38. 有迭代器的就可以通过...展开
+
+      39. Array.from将类数组，有迭代器的东西变成数组，第二个参数类似map，将里面的东西处理后返回，即将第一个参数变成数组然后使用map进行处理后再返回；
+
+      40. 数组keys, values, entries依次返回键，值，键值对
+
+      41. Object.is方法用来判断两个值是否相等，补充了===里面的+0和-0相等，NaN不等于自身的问题；
+
+      42. Set进行去重；
+
+          - 初始的时候里面传入字符串的话就会是将字符串拆开变成数组，所以可以用于字符串内的字符去重；
+          - 对象用于是不等的
+          - 不会发生类型转换，即类似于===的判断标准
+          - 本身由add, delete, has, clear四个操作方法
+          - Keys, values, entries, forEach四个遍历方法
+
+      43. Map，解决是只能使用字符串当做键名的问题，本身不是字符串或者变量不是字符串的会变；
+
+          - 可以把对象当做键，准确说就是值-值的对应关系
+          - set设置，get获得；
+          - 本身记录的是指针位置，所以{}和{}就是两个值了
+
+      44. Promise对象
+
+          1. 两个特点：
+
+             - 不受外界干扰：即只有里面的异步操作可以进行状态的更改，也是promise的由来
+             - 一旦状态改变，任何时候都能获取；不像事件，错过了就监听不到了；
+
+          2. 使用方式如下：本身接受两个cb，一个进then另一个进catch，且catch内容冒泡可以接受所有promise的reject；
+
+             ```javascript
+             const getJson = (url) => {
+               return new Promise((resolve, reject)=>{
+                 const handler = () => {
+                   if(this.readyState !== 4) {
+                     return
+                   }
+                   if(this.status === 200){
+                     resolve(this.response)
+                   } else {
+                     reject(new Error(this.statusText))
+                   }
+                 }
+                 const client = new XMLHttpRequest()
+                 client.open('GET', url)
+                 client.onreadystatechange = handler
+                 client.responseType = 'json'
+                 client.setRequestHeader = ('Accept', 'application/json')
+                 client.send()
+               })
+             }
+             ```
+
+          3. resolve里面可以接受promise，这时old要看里面的状态，当里面的不是pending的时候才会执行；
+
+          4. resolve和reject会改变状态但是不会终止代码的执行；但是resolve之后再throw Error的话就是改变状态所以不会执行，另外直接return也不会执行了，且在then里面return的也是Promise的话就能使用then
+
+          5. 看下面的延迟throw Error，因为是异步的throw，所以在then的时候执行且在Promise外层，catch捕获不到；
+
+             ```javascript
+             const delayThrow = new Promise((r1, r2)=>{
+               r1('ok')
+               setTimeOut(()=>{
+                 throw new Error('sorry')
+               }, 0)
+             })
+             delayThrow.then(()=>{}) // ok sorry
+             ```
+
+          6. finally方法，不管状态如何都会执行；是下面的语法糖
+
+             ```javascript
+             Promise.prototype.finally = function(cb){
+               let p = this.constructor
+               return this.then(
+                 value => {
+                   // 这里要执行
+                   p.resolve(cb()).then(()=>{value})
+                 }, 
+                 error => {
+                   p.resolve(cb()).then(() => throw error)
+                 })
+             }
+             ```
+
+          7. 注意catch方法拿到的是异步的错误，try里面拿到的是同步的错误；简化方式如下，所有的错误都放到catch里面了；
+
+             ```javascript
+             Promise.try(()=>getData()).then().catch()
+             ```
+
+      45. Generator
+
+          1. 异步，即分段执行的函数，之间可以插入其他的函数，实现了异步操作；即协程
+
+          2. 利用回调实现，即分段函数就是当第一段有返回的时候执行cb；且错误必须作为参数传入第二段，因为执行完上下文就没了，所以错误只能在第二段执行
+
+          3. thunk，实现传名调用；看代码，即使用的时候再计算
+
+             ```javascript
+             let x = 2
+             const a = (x)=> x+2
+             a(x+5)
+             // thunk实现
+             const thunk = () => x+5
+             const a = (cb) => cb() + 2
+             ```
+
+             
 
    2. class和普通构造函数的区别
 
