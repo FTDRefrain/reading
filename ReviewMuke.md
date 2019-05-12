@@ -257,7 +257,7 @@
 
           2. 利用回调实现，即分段函数就是当第一段有返回的时候执行cb；且错误必须作为参数传入第二段，因为执行完上下文就没了，所以错误只能在第二段执行
 
-          3. thunk，实现传名调用；看代码，即使用的时候再计算
+          3. thunk，实现传名调用；看代码，即使用的时候再计算，用来实现迭代器里面的同步执行
 
              ```javascript
              let x = 2
@@ -266,6 +266,114 @@
              // thunk实现
              const thunk = () => x+5
              const a = (cb) => cb() + 2
+             ```
+
+          4. 迭代器里面的同步执行如下，即yield跳出迭代器，所以要另外有一个指令回到迭代器，手动执行如下
+
+             ```javascript
+             // g是迭代函数
+             var g = gen();
+             var r1 = g.next();
+             // next返回的是value和done两个值；
+             r1.value(function (err, data) {
+               if (err) throw err;
+               var r2 = g.next(data);
+               r2.value(function (err, data) {
+                 if (err) throw err;
+                 g.next(data);
+               });
+             });
+             ```
+
+          5. Promise控制迭代器代码如下
+
+             ```javascript
+             var fs = require('fs');
+             // 返回的是promise对象
+             var readFile = function (fileName){
+               return new Promise(function (resolve, reject){
+                 fs.readFile(fileName, function(error, data){
+                   if (error) return reject(error);
+                   resolve(data);
+                 });
+               });
+             };
+             
+             var gen = function* (){
+               var f1 = yield readFile('/etc/fstab');
+               var f2 = yield readFile('/etc/shells');
+               console.log(f1.toString());
+               console.log(f2.toString());
+             };
+             
+             function run(gen){
+               var g = gen();
+             
+               function next(data){
+                 var result = g.next(data);
+                 if (result.done) return result.value;
+                 result.value.then(function(data){
+                   // 一步一步的链式操作下去；
+                   next(data);
+                 });
+               }
+               next();
+             }
+             run(gen);
+             ```
+
+      46. async函数
+
+          1. 本身是迭代器的语法糖，async替代了*，表示里面有异步操作；await替代了yield表示等待；
+
+          2. 里面遇到await会返回promise对象，即可以通过then调用；没有await的话，本身的return就是一个promise对象；
+
+          3. 内置了执行器，不用自己去next调用了；
+
+          4. 依次实现动画，当动画有错误的时候停止且返回上一个值；实例代码如下
+
+             ```javascript
+             // promise实现
+             function chainAni(elem, animes){
+               // 存之前的值
+               let ret = null
+               // 链式的起点
+               let p = Promise.resolve()
+               for(let anime of animes){
+                 p = p.then((val)=>{
+                   ret = val
+                   return anime(elem)
+                 })
+               }
+               return p.catch().then(() => ret)
+             }
+             
+             // Generator实现
+             function chainAnime(elem, animes){
+               // 返回是可以控制自动迭代的函数
+               return spawn(function* (){
+                 let ret = null
+                 try{
+                   for(let anime of animes){
+                     ret = yield anime(elem)
+                   }
+                 } catch(e){
+                   
+                 }
+                 return ret
+               })
+             }
+             // async
+             // 从形式也能看出语法糖的感觉
+             async function chainAnime(elem, animes){
+               let ret = null
+               try{
+                 for(let anime in animes){
+                   ret = await anime(elem)
+                 }
+               } catch(e){}
+               return ret
+             }
              ```
 
              
