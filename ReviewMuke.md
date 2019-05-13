@@ -576,7 +576,85 @@
       }
       ```
    
+   2. 大概的转换代码如下
+   
+      ```javascript
+      // 伪代码
+      function vDom(vnode){
+        const { tag, attrs={}, children=[] } = vnode
+        tag || return null
+        // 创建元素
+        const elem = document.createElement(tag)
+        // 添加属性
+        for(attrName in attrs){
+          if(elem.hasOwnProperty(attrName)){
+            elem.setAttribute(attr, attrs[attrName])
+          }
+        }
+        // 添加子节点
+        children.foreach((child)=>{
+          // 递归构建子节点后连接上去
+          elem.appendChild(vDom(child))
+        })
+        // 返回DOM元素
+        return elem
+      }
+      ```
+   
       
+   
+   3. snabbdom进行VDOM的实现：使用patch(container, newNode)和patch(oldNode, newNode)两种方式；
+   
+   4. DIFF算法，
+   
+5. MVVM和Vue
+
+   1. ViewModel分离View和model：Dom Listener实现响应，data bindings实现数据驱动
+
+   2. 响应式：
+
+      1. 即数据实时更新，实现代码如下
+
+         ```javascript
+         let obj = {}
+         let name = '123'
+         // 这样对象的属性值才是动态的
+         Object.defineProperty(obj, 'name', {
+           get: function(){
+             return name
+           },
+           set: function(newVal){
+             name = newVal
+           }
+         })
+         ```
+
+      2. 模仿Vue实现如下
+
+         ```javascript
+         let vm = {}
+         let data = {
+           title:'123',
+           content:'123'
+         }
+         for(let key in data){
+           // 闭包实现，使用let，不是闭包也行了
+           (function(key){
+             Object.defineProperty(vm, key, {
+               get: function(){
+                 return data[key]
+               },
+               set:function(newVal){
+                 data[key] = newVal
+               }
+             })
+           })(key)
+         }
+         ```
+
+   3. 模板解析
+
+   4. render函数：
 
 
 
