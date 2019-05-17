@@ -376,14 +376,12 @@
              }
              ```
 
-             
-
    2. class和普通构造函数的区别
 
       1. 构造函数
 
          ```javascript
-         // 构造函数
+      // 构造函数
          function Cons(x, y){
          	this.x = x;
            this.y = y
@@ -397,7 +395,7 @@
          // 特性，即new生成的可以通过原型链找到原来的东西；
          a._proto_ === Cons.prototype //true
          ```
-
+   
       2. class本身是语法糖，一个特性就是`Cons = Cons.prototype.constructor`，这样就实现了class；
 
       3. 继承
@@ -405,21 +403,21 @@
          1. ES6之前的方式
 
             ```javascript
-            function C1(){}
+         function C1(){}
             function C2(){}
             C2.prototype = C1
             let c = new C2()
             c._proto_ === C1 //true
             ```
-
+   
          2. 之后就直接是extends
 
    3. Promise相关内容
 
       ```javascript
-      const pro = new Promise((resolve, reject)=>{})
+   const pro = new Promise((resolve, reject)=>{})
       ```
-
+   
       每次的then都是传入两个回调，成功和失败；
 
    4. 新转化的方式，[a, b] = [b, a]；
@@ -656,7 +654,94 @@
 
    4. render函数：
 
-      1. 
+      1. 大致会进行如下的转换
+
+         ```javascript
+         <input v-model="title" />
+         vm._c(
+         	'input',
+           {
+             directives:[{
+               name:'model',
+               rawName:'v-model',
+               // 这里因为是用with起手，所以变量就是vue的data里面的变量，即实现了数据绑定
+               value:(title),
+               expression:'title'
+             }],
+             domProps:{
+               'value':(title)
+             },
+             // 挂载默认或者自己设置的method
+             on:{
+               'input':function(e){
+                 title = e.target.value
+               }
+             }
+           }
+         ),
+         ```
+
+      2. 本身是实时渲染的，将html内容变成js代码
+
+      3. render是将html变成vnode，然后在更新的时候调用update函数进行vnode之间的比较，之后再patch上去
+
+         ```javascript
+         // 放到双向绑定的set里面就可以了且初始自动执行
+         function updateDom(){
+           this._update(this.render())
+         }
+         const _update = (vnode) => {
+           const preNode = this._vnode
+           this._vnode = vnode
+           if(!preVnode){
+             // 全新是挂载
+             this.$el = this.__patch__(vm.$el, vnode)
+           } else {
+             // 有内容是patch
+             this.$el = this.__patch__(preNode, vnode)
+           }
+         }
+         ```
+
+      4. 整体的流程如下
+
+         1. 解析模板生成render函数，使用with和return vNode使用的是_c(vDom)
+         2. 定义数据的双向绑定；
+         3. 首次渲染，显示页面且绑定依赖：这里面绑定依赖要监听get，因为有些属性并没有参与到render，即set不应该被触发，所以set的时候要监听是否get了，如果确实get过才应该添加set
+         4. 属性变化执行更新，在set中执行update的过程是异步的；
+
+6. React和组件化
+
+   1. 特点：
+      - 封装：视图，数据，变化逻辑
+      - 复用：结构复用；
+   2. JSX，可以使用在线或者命令行的transform-react-jsx进行内容的展现
+      1. 本身是将html的东西放到了React.createElement里面
+      2. 自定义组件：本身通过new构建一个实例，将props放进去，然后调用render方法生成html；
+   3. setState
+      1. 异步过程
+      2. 在异步回调函数里面调用了patch函数，实现了render
+
+7. Hybrid
+
+   1. 本身并不是h5，例如一个页面，上的返回和下面的输入都是服务端的东西；中间的内容包括用户名字，内容等都是客户端的东西
+   2. 优点
+      1. 快速迭代更新：开发块且无需审核(脱离于native内容)
+      2. 体验基本和native差不多
+      3. 双端通用
+   3. webView
+      1. 浏览器的内核，承载html页面
+      2. 本身可以作为app的一个组件
+   4. file协议：本地文件，http协议则是网络加载；
+   5. 实现方式：即把文件变成静态的页面(html + css + js)，然后在webview里面通过file协议进行内容的导入；流程如下
+      - 构建版本号，将静态文件压缩成zip包，上传到服务端
+      - 客户端启动时候进行版本号检查，不同则下载zip
+      - 解压将文件覆盖
+   6. 缺点：联调和测试麻烦，运维成本高；
+   7. 使用场景：体验要求高和迭代频繁；h5适合的就是单次的
+   8. JS-SDK进行JS和客户端的通信；
+   9. 客户端获取内容，因为js要在dom加载完然后执行进行内容的获取，客户端可以直接获取内容，然后js获取客户端接口的内容；
+   10. schema协议，就是客户端和前端通信；可以通过传参和回调函数的方式；简单的方式就是通过iframe.src='js-sdk?k1=1&callback=_cb1'这样的方式，因为要传回调，所以必须是全局挂载的，使用完毕后再删掉iframe；
 
 
 

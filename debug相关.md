@@ -1,0 +1,2 @@
+1. input监控onChange事件实现文件的上传而不是click事件
+2. Base64, blob和file对象也可相互转换，且上传的时候，因为自己转换的file对象没有名字，所以需要将input拿到的file名字记录一下；上个对象可能在上传的时候有限制
