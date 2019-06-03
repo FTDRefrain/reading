@@ -737,16 +737,16 @@
                   1. widget节点分三类
       
                      1. leaf：没有子节点，Text, Image这种
-         2. SingleChild： 单个的子节点，用child表示，如ConstrainedBox，DecoratedBox，
+                     2. SingleChild： 单个的子节点，用child表示，如ConstrainedBox，DecoratedBox
                      3. MultiChild：复数的子节点，children后面接的是个数组
-                     4. Flutter里面，上述的widget都继承于有状态和无状态组件，然后再将这些widget作为参数，传到对应的renderObject，然后渲染成element展示；具体的渲染算法在renderObject里面；
-                
-                  2. 线性布局，Row和Column；
+                     4. Flutter里面，上述的widget都继承于有状态和无状态组件，然后再将这些widget作为参数，传到对应的renderObject，然后渲染成element展示；具体的渲染算法在renderObject里面
+                     
+                  2. 线性布局，Row和Column
                   
                      1. 两个继承自flex；
-                    
+                  
                      2. 主轴和纵轴的问题：和web一样，具体看下面的例子
-                    
+                  
                         ```dart
                         Column(
                           //测试Row对齐方式，排除Column默认居中对齐的干扰
@@ -760,41 +760,41 @@
                                 Text(" I am Jack "),
                               ],
                             ),
-                Row(
-                              // 限制了主轴大小，所以居中以长度为准
-                     mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                     children: <Widget>[
-                                Text(" hello world "),
-                         Text(" I am Jack "),
-                              ],
-                      ),
                             Row(
-                     // 因为是右排序，所以主轴end在左边，和上一个一样结果
+                                  // 限制了主轴大小，所以居中以长度为准
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                                    Text(" hello world "),
+                             				Text(" I am Jack "),
+                                  ],
+                             ),
+                            Row(
+                        // 因为是右排序，所以主轴end在左边，和上一个一样结果
                               mainAxisAlignment: MainAxisAlignment.end,
-                     textDirection: TextDirection.rtl,
+                        textDirection: TextDirection.rtl,
                               children: <Widget>[
                          Text(" hello world "),
                                 Text(" I am Jack "),
-                     ],
+                        ],
                             ),
-                      Row(
+                         Row(
                               // 因为是up，所以start对齐的时候是根据底部了
-                     crossAxisAlignment: CrossAxisAlignment.start,  
+                        crossAxisAlignment: CrossAxisAlignment.start,  
                               verticalDirection: VerticalDirection.up,
-                     children: <Widget>[
+                        children: <Widget>[
                                 Text(" hello world ", style: TextStyle(fontSize: 30.0),),
                          Text(" I am Jack "),
                               ],
-                      ),
+                         ),
                           ],
-               );
-                       ```
-         
+                        );
+                        ```
+                  
                      3. 注意column和row里面再嵌套的时候，里面设置成max，展现的也是实际长度；
-         
-                  3. Flex布局，和web差不多，直接看代码
-         
+                  
+                     4. Flex布局，和web差不多，直接看代码
+                  
                      ```dart
                      class FlexLayoutTestRoute extends StatelessWidget {
                        @override
@@ -858,10 +858,10 @@
                      }
                      ```
                   
-                  4. Wrap，流式布局，即超出部分会自动换行的布局
+                     1. Wrap，流式布局，即超出部分会自动换行的布局
                   
                      1. 代码如下，感觉上和栅格差不多，结果是一行三个，第二行内容居中
-                    
+                  
                         ```dart
                         Wrap(
                           spacing: 8.0, // 主轴(水平)方向间距
@@ -888,452 +888,346 @@
                         )
                         ```
                   
-                  5. Flow布局，同上面一样，但是要自己计算子节点的位置然后控制布局位置
+                     1. Flow布局，同上面一样，但是要自己计算子节点的位置然后控制布局位置
                   
-                  6. Stack布局
+                     2. Stack布局
                   
-                     1. 还是直接上代码
-                    
-                        ```dart
-                        //通过ConstrainedBox来确保Stack占满屏幕
-                        ConstrainedBox(
-                          constraints: BoxConstraints.expand(),
-                          child: Stack(
-                            alignment:Alignment.center , //指定未定位或部分定位widget的对齐方式
-                            fit: StackFit.expand, //未定位widget占满Stack整个空间
-                            children: <Widget>[
-                              // 顺序有关系，因为是第一个且之后都是绝对布局，所以不会挡住
-                              // 当container下调之后，本身又不是绝对布局，会产生覆盖的；
-                              Container(child: Text("Hello world",style: TextStyle(color: Colors.white)),
-                                color: Colors.red,
-                              ),
-                              Positioned(
-                                left: 18.0,
-                                child: Text("I am Jack"),
-                              ),
-                              Positioned(
-                                top: 18.0,
-                                child: Text("Your friend"),
-                              )        
-                            ],
-                          ),
-                        );
-                        ```
+                        1. 还是直接上代码
                   
-               8. 容器类widget：本身类似于border，里面是child，而布局类是children，一般用于添加样式修饰，变换或者限制大小等
-              
-                  1. Padding使用，代码如下
-               
-                     ```dart
-                     class PaddingTestRoute extends StatelessWidget {
-                       @override
-                       Widget build(BuildContext context) {
-                         return Padding(
-                           //上下左右各添加16像素补白
-                           padding: EdgeInsets.all(16.0),
-                           child: Column(
-                             //显式指定对齐方式为左对齐，排除对齐干扰
-                             crossAxisAlignment: CrossAxisAlignment.start,
+                           ```dart
+                           //通过ConstrainedBox来确保Stack占满屏幕
+                           ConstrainedBox(
+                             constraints: BoxConstraints.expand(),
+                             child: Stack(
+                               alignment:Alignment.center , //指定未定位或部分定位widget的对齐方式
+                               fit: StackFit.expand, //未定位widget占满Stack整个空间
+                               children: <Widget>[
+                                 // 顺序有关系，因为是第一个且之后都是绝对布局，所以不会挡住
+                                 // 当container下调之后，本身又不是绝对布局，会产生覆盖的；
+                                 Container(child: Text("Hello world",style: TextStyle(color: Colors.white)),
+                                   color: Colors.red,
+                                 ),
+                                 Positioned(
+                                   left: 18.0,
+                                   child: Text("I am Jack"),
+                                 ),
+                                 Positioned(
+                                   top: 18.0,
+                                   child: Text("Your friend"),
+                                 )        
+                               ],
+                             ),
+                           );
+                           ```
+                  
+                     3. 容器类widget：本身类似于border，里面是child，而布局类是children，一般用于添加样式修饰，变换或者限制大小等
+                  
+                        1. Padding使用，代码如下
+                  
+                           ```dart
+                           class PaddingTestRoute extends StatelessWidget {
+                             @override
+                             Widget build(BuildContext context) {
+                               return Padding(
+                                 //上下左右各添加16像素补白
+                                 padding: EdgeInsets.all(16.0),
+                                 child: Column(
+                                   //显式指定对齐方式为左对齐，排除对齐干扰
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: <Widget>[
+                                     Padding(
+                                       //左边添加8像素补白
+                                       padding: const EdgeInsets.only(left: 8.0),
+                                       child: Text("Hello world"),
+                                     ),
+                                     Padding(
+                                       //上下各添加8像素补白
+                                       padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                       child: Text("I am Jack"),
+                                     ),
+                                     Padding(
+                                       // 分别指定四个方向的补白
+                                       padding: const EdgeInsets.fromLTRB(20.0,.0,20.0,20.0),
+                                       child: Text("Your friend"),
+                                     )
+                                   ],
+                                 ),
+                               );
+                             }
+                           }
+                           
+                           ```
+                  
+                        2. ConstrainBox和sizeBox
+                  
+                           1. 直接看代码
+                  
+                              ```dart
+                              Widget redBox=DecoratedBox(
+                                decoration: BoxDecoration(color: Colors.red),
+                              );
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  // maxWidth指定最大宽度
+                                  minWidth: double.infinity, //宽度尽可能大
+                                  minHeight: 50.0 //最小高度为50像素
+                                ),
+                                child: Container(
+                                  	// 高度没有用，因为限制了最小高度
+                                    height: 5.0, 
+                                    child: redBox 
+                                ),
+                              )
+                              ```
+                  
+                           2. SizeBox则是直接指定大小
+                  
+                              ```dart
+                              SizedBox(
+                                width: 80.0,
+                                height: 80.0,
+                                child: redBox
+                              )
+                              ```
+                  
+                           3. 多重限制的时候，min取复数中大的，max取小的，这样就没有冲突
+                  
+                           4. 去除父组件的限制，下面就是因为appBar的actions本身有大小限制，所以使用UnconstrainedBox去除父组件的限制
+                  
+                              ```dart
+                              AppBar(
+                                title: Text(title),
+                                actions: <Widget>[
+                                    UnconstrainedBox(
+                                          child: SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 3,
+                                              valueColor: AlwaysStoppedAnimation(Colors.white70),
+                                            ),
+                                        ),
+                                    )
+                                ],
+                              )
+                              
+                              ```
+                  
+                        3. DecoratedBox则是进行样式的修改
+                  
+                           1. 样式使用如下
+                  
+                              ```dart
+                              DecoratedBox(
+                                	// 直接使用BoxDecoration，本身是上面box的子类
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(colors:[Colors.red,Colors.orange[700]]), //背景渐变
+                                    borderRadius: BorderRadius.circular(3.0), //3像素圆角
+                                    boxShadow: [ //阴影
+                                      BoxShadow(
+                                          color:Colors.black54,
+                                          offset: Offset(2.0,2.0),
+                                          blurRadius: 4.0
+                                      )
+                                    ]
+                                  ),
+                                child: Padding(padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 18.0),
+                                  child: Text("Login", style: TextStyle(color: Colors.white),),
+                                )
+                              )
+                              ```
+                  
+                        4. 变换，transform和rotate，例子如下
+                  
+                           ```dart
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.center,
                              children: <Widget>[
-                               Padding(
-                                 //左边添加8像素补白
-                                 padding: const EdgeInsets.only(left: 8.0),
-                                 child: Text("Hello world"),
+                               DecoratedBox(
+                                 decoration:BoxDecoration(color: Colors.red),
+                                 // 在绘制阶段，即先定好后才变形
+                                 child: Transform.scale(
+                                     scale: 1.5,
+                                     child: Text("Hello world")
+                                 )
                                ),
-                               Padding(
-                                 //上下各添加8像素补白
-                                 padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                 child: Text("I am Jack"),
+                               Text("你好", style: TextStyle(color: Colors.green, fontSize: 18.0),)
+                             ],
+                           )
+                           // 在layout层面构建，所以会因为变形而适应  
+                           Row(
+                             mainAxisAlignment: MainAxisAlignment.center,
+                             children: <Widget>[
+                               DecoratedBox(
+                                 decoration: BoxDecoration(color: Colors.red),
+                                 //将Transform.rotate换成RotatedBox  
+                                 child: RotatedBox(
+                                   quarterTurns: 1, //旋转90度(1/4圈)
+                                   child: Text("Hello world"),
+                                 ),
                                ),
-                               Padding(
-                                 // 分别指定四个方向的补白
-                                 padding: const EdgeInsets.fromLTRB(20.0,.0,20.0,20.0),
-                                 child: Text("Your friend"),
-                               )
+                               Text("你好", style: TextStyle(color: Colors.green, fontSize: 18.0),)
                              ],
                            ),
-                         );
-                       }
-                     }
-                     ```
-               
-                  2. ConstrainBox和sizeBox
-               
-                     1. 直接看代码
-               
+                           ```
+                  
+                        5. Container，相当于上面的整合，直接看代码
+                  
+                           ```dart
+                           Container(
+                             margin: EdgeInsets.only(top: 50.0, left: 120.0), //容器外补白
+                             constraints: BoxConstraints.tightFor(width: 200.0, height: 150.0), //卡片大小，或者使用width, height限制
+                             decoration: BoxDecoration(//背景装饰
+                                 gradient: RadialGradient( //背景径向渐变
+                                     colors: [Colors.red, Colors.orange],
+                                     center: Alignment.topLeft,
+                                     radius: .98
+                                 ),
+                                 boxShadow: [ //卡片阴影
+                                   BoxShadow(
+                                       color: Colors.black54,
+                                       offset: Offset(2.0, 2.0),
+                                       blurRadius: 4.0
+                                   )
+                                 ]
+                             ),
+                             transform: Matrix4.rotationZ(.2), //卡片倾斜变换
+                             alignment: Alignment.center, //卡片内文字居中
+                             color:Colors.orange, // 这里是背景色
+                             child: Text( //卡片文字
+                               "5.20", style: TextStyle(color: Colors.white, fontSize: 40.0),
+                             ),
+                           );
+                           ```
+                  
+                        6. Scaffold，TabBar和底部导航；依旧还是直接上代码
+                  
                         ```dart
-                        Widget redBox=DecoratedBox(
-                          decoration: BoxDecoration(color: Colors.red),
-                        );
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            // maxWidth指定最大宽度
-                            minWidth: double.infinity, //宽度尽可能大
-                            minHeight: 50.0 //最小高度为50像素
-                          ),
-                          child: Container(
-                            	// 高度没有用，因为限制了最小高度
-                              height: 5.0, 
-                              child: redBox 
-                          ),
-                        )
-                        ```
-               
-                     2. SizeBox则是直接指定大小
-               
-                        ```dart
-                        SizedBox(
-                          width: 80.0,
-                          height: 80.0,
-                          child: redBox
-                        )
-                        ```
-               
-                     3. 多重限制的时候，min取复数中大的，max取小的，这样就没有冲突
-               
-                     4. 去除父组件的限制，下面就是因为appBar的actions本身有大小限制，所以使用UnconstrainedBox去除父组件的限制
-               
-                        ```dart
-                        AppBar(
-                          title: Text(title),
-                          actions: <Widget>[
-                              UnconstrainedBox(
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 3,
-                                        valueColor: AlwaysStoppedAnimation(Colors.white70),
-                                      ),
-                                  ),
-                              )
-                          ],
-                        )
-                        ```
-               
-                  3. DecoratedBox则是进行样式的修改
-               
-                     1. 样式使用如下
-               
-                        ```dart
-                        DecoratedBox(
-                          	// 直接使用BoxDecoration，本身是上面box的子类
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(colors:[Colors.red,Colors.orange[700]]), //背景渐变
-                              borderRadius: BorderRadius.circular(3.0), //3像素圆角
-                              boxShadow: [ //阴影
-                                BoxShadow(
-                                    color:Colors.black54,
-                                    offset: Offset(2.0,2.0),
-                                    blurRadius: 4.0
-                                )
-                              ]
-                            ),
-                          child: Padding(padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 18.0),
-                            child: Text("Login", style: TextStyle(color: Colors.white),),
-                          )
-                        )
-                        ```
-               
-                  4. 变换，transform和rotate，例子如下
-               
-                     ```dart
-                     Row(
-                       mainAxisAlignment: MainAxisAlignment.center,
-                       children: <Widget>[
-                         DecoratedBox(
-                           decoration:BoxDecoration(color: Colors.red),
-                           // 在绘制阶段，即先定好后才变形
-                           child: Transform.scale(
-                               scale: 1.5,
-                               child: Text("Hello world")
-                           )
-                         ),
-                         Text("你好", style: TextStyle(color: Colors.green, fontSize: 18.0),)
-                       ],
-                     )
-                     // 在layout层面构建，所以会因为变形而适应  
-                     Row(
-                       mainAxisAlignment: MainAxisAlignment.center,
-                       children: <Widget>[
-                         DecoratedBox(
-                           decoration: BoxDecoration(color: Colors.red),
-                           //将Transform.rotate换成RotatedBox  
-                           child: RotatedBox(
-                             quarterTurns: 1, //旋转90度(1/4圈)
-                             child: Text("Hello world"),
-                           ),
-                         ),
-                         Text("你好", style: TextStyle(color: Colors.green, fontSize: 18.0),)
-                       ],
-                     ),
-                     ```
-               
-                  5. Container，相当于上面的整合，直接看代码
-               
-                     ```dart
-                     Container(
-                       margin: EdgeInsets.only(top: 50.0, left: 120.0), //容器外补白
-                       constraints: BoxConstraints.tightFor(width: 200.0, height: 150.0), //卡片大小，或者使用width, height限制
-                       decoration: BoxDecoration(//背景装饰
-                           gradient: RadialGradient( //背景径向渐变
-                               colors: [Colors.red, Colors.orange],
-                               center: Alignment.topLeft,
-                               radius: .98
-                           ),
-                           boxShadow: [ //卡片阴影
-                             BoxShadow(
-                                 color: Colors.black54,
-                                 offset: Offset(2.0, 2.0),
-                                 blurRadius: 4.0
-                             )
-                           ]
-                       ),
-                       transform: Matrix4.rotationZ(.2), //卡片倾斜变换
-                       alignment: Alignment.center, //卡片内文字居中
-                       color:Colors.orange, // 这里是背景色
-                       child: Text( //卡片文字
-                         "5.20", style: TextStyle(color: Colors.white, fontSize: 40.0),
-                       ),
-                     );
-                     ```
-               
-                  6. Scaffold，TabBar和底部导航；依旧还是直接上代码
-               
-                  ```dart
-                  static GlobalKey<ScaffoldState> _globalKey= new GlobalKey();
-                  class ScaffoldRoute extends StatefulWidget {
-                    @override
-                    _ScaffoldRouteState createState() => _ScaffoldRouteState();
-                  }
-                  
-                  class _ScaffoldRouteState extends State<ScaffoldRoute> {
-                    int _selectedIndex = 1;
-                  
-                    @override
-                    Widget build(BuildContext context) {
-                      // 导航栏
-                      return Scaffold(
-                        key: _globalKey //设置key，之后方便方法调用
-                        appBar: AppBar( //导航栏
-                          title: Text("App Name"), 
-                          actions: <Widget>[ //导航栏右侧菜单
-                            IconButton(icon: Icon(Icons.share), onPressed: () {}),
-                          ],
-                        ),
-                        // 可以通过重写leading来更改，本身和下面的drawer是一个东西
-                        leading: Builder(builder: (context) {
-                          return IconButton(
-                            icon: Icon(Icons.dashboard, color: Colors.white), //自定义图标
-                            onPressed: () {
-                              // 打开抽屉菜单  
-                              Scaffold.of(context).openDrawer(); 
-                            },
-                          );
-                        }),
-                        drawer: new MyDrawer(), //抽屉，默认的左上角内容
-                        bottomNavigationBar: BottomNavigationBar( // 底部导航
-                          items: <BottomNavigationBarItem>[
-                            BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
-                            BottomNavigationBarItem(icon: Icon(Icons.business), title: Text('Business')),
-                            BottomNavigationBarItem(icon: Icon(Icons.school), title: Text('School')),
-                          ],
-                          currentIndex: _selectedIndex,
-                          fixedColor: Colors.blue,
-                          onTap: _onItemTapped,
-                        ),
-                        floatingActionButton: FloatingActionButton( //悬浮按钮
-                            child: Icon(Icons.add),
-                            onPressed:_onAdd
-                        ),
-                      );
-                    }
-                    void _onItemTapped(int index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    }
-                    void _onAdd(){
-                    }
-                  }
-                  ```
-               
-               7. appBar下面的行级菜单
-               
-                  ```dart
-                  class _ScaffoldRouteState extends State<ScaffoldRoute>
-                      with SingleTickerProviderStateMixin {
-                  
-                    TabController _tabController; //需要定义一个Controller
-                    List tabs = ["新闻", "历史", "图片"];
-                  
-                    @override
-                    void initState() {
-                      super.initState();
-                      // 创建Controller  
-                      _tabController = TabController(length: tabs.length, vsync: this);
-                    }
-                  
-                    @override
-                    Widget build(BuildContext context) {
-                      return Scaffold(
-                        appBar: AppBar(
-                          ... //省略无关代码
-                          bottom: TabBar(   //生成Tab菜单
-                            controller: _tabController,
-                            // tab可以自定义设置的
-                            tabs: tabs.map((e) => Tab(text: e)).toList()
-                          ),
-                        ),
-                        // 实现了下面内容和上面东西联动
-                        body: TabBarView(
-                          controller: _tabController,
-                          children: tabs.map((e) { //创建3个Tab页
-                            return Container(
-                              alignment: Alignment.center,
-                              child: Text(e, textScaleFactor: 5),
+                        static GlobalKey<ScaffoldState> _globalKey= new GlobalKey();
+                        class ScaffoldRoute extends StatefulWidget {
+                          @override
+                          _ScaffoldRouteState createState() => _ScaffoldRouteState();
+                        }
+                        
+                        class _ScaffoldRouteState extends State<ScaffoldRoute> {
+                          int _selectedIndex = 1;
+                        
+                          @override
+                          Widget build(BuildContext context) {
+                            // 导航栏
+                            return Scaffold(
+                              key: _globalKey //设置key，之后方便方法调用
+                              appBar: AppBar( //导航栏
+                                title: Text("App Name"), 
+                                actions: <Widget>[ //导航栏右侧菜单
+                                  IconButton(icon: Icon(Icons.share), onPressed: () {}),
+                                ],
+                              ),
+                              // 可以通过重写leading来更改，本身和下面的drawer是一个东西
+                              leading: Builder(builder: (context) {
+                                return IconButton(
+                                  icon: Icon(Icons.dashboard, color: Colors.white), //自定义图标
+                                  onPressed: () {
+                                    // 打开抽屉菜单  
+                                    Scaffold.of(context).openDrawer(); 
+                                  },
+                                );
+                              }),
+                              drawer: new MyDrawer(), //抽屉，默认的左上角内容
+                              bottomNavigationBar: BottomNavigationBar( // 底部导航
+                                items: <BottomNavigationBarItem>[
+                                  BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
+                                  BottomNavigationBarItem(icon: Icon(Icons.business), title: Text('Business')),
+                                  BottomNavigationBarItem(icon: Icon(Icons.school), title: Text('School')),
+                                ],
+                                currentIndex: _selectedIndex,
+                                fixedColor: Colors.blue,
+                                onTap: _onItemTapped,
+                              ),
+                              floatingActionButton: FloatingActionButton( //悬浮按钮
+                                  child: Icon(Icons.add),
+                                  onPressed:_onAdd
+                              ),
                             );
-                          }).toList(),
-                        ),
+                          }
+                          void _onItemTapped(int index) {
+                            setState(() {
+                              _selectedIndex = index;
+                            });
+                          }
+                          void _onAdd(){
+                          }
+                        }
+                        ```
                   
-                    }
-                  ```
-               
-               8. Drawer，抽屉即左边划出的内容
-               
-            7. Cupertino widget，苹果的东西，大概的代码如下所示
-            
-               ```dart
-               //导入cupertino widget库
-               import 'package:flutter/cupertino.dart';
-               
-               class CupertinoTestRoute extends StatelessWidget {
-                 @override
-                 Widget build(BuildContext context) {
-                   return CupertinoPageScaffold(
-                     navigationBar: CupertinoNavigationBar(
-                       middle: Text("Cupertino Demo"),
-                     ),
-                     child: Center(
-                       child: CupertinoButton(
-                           color: CupertinoColors.activeBlue,
-                           child: Text("Press"),
-                           onPressed: () {}
-                       ),
-                     ),
-                   );
-                 }
-               }
-               
-               ```
-            
-            8. 
+                     4. appBar下面的行级菜单
+                  
+                        ```dart
+                        class _ScaffoldRouteState extends State<ScaffoldRoute>
+                            with SingleTickerProviderStateMixin {
+                        
+                          TabController _tabController; //需要定义一个Controller
+                          List tabs = ["新闻", "历史", "图片"];
+                        
+                          @override
+                          void initState() {
+                            super.initState();
+                            // 创建Controller  
+                            _tabController = TabController(length: tabs.length, vsync: this);
+                          }
+                        
+                          @override
+                          Widget build(BuildContext context) {
+                            return Scaffold(
+                              appBar: AppBar(
+                                ... //省略无关代码
+                                bottom: TabBar(   //生成Tab菜单
+                                  controller: _tabController,
+                                  // tab可以自定义设置的
+                                  tabs: tabs.map((e) => Tab(text: e)).toList()
+                                ),
+                              ),
+                              // 实现了下面内容和上面东西联动
+                              body: TabBarView(
+                                controller: _tabController,
+                                children: tabs.map((e) { //创建3个Tab页
+                                  return Container(
+                                    alignment: Alignment.center,
+                                    child: Text(e, textScaleFactor: 5),
+                                  );
+                                }).toList(),
+                              ),
+                        
+                          }
+                        ```
+                  
+                     5. Drawer，抽屉即左边划出的内容
+                  
+                     6. Cupertino widget，苹果的东西，大概的代码如下所示
+                  
+                        ```dart
+                        //导入cupertino widget库
+                        import 'package:flutter/cupertino.dart';
+                        
+                        class CupertinoTestRoute extends StatelessWidget {
+                          @override
+                          Widget build(BuildContext context) {
+                            return CupertinoPageScaffold(
+                              navigationBar: CupertinoNavigationBar(
+                                middle: Text("Cupertino Demo"),
+                              ),
+                              child: Center(
+                                child: CupertinoButton(
+                                    color: CupertinoColors.activeBlue,
+                                    child: Text("Press"),
+                                    onPressed: () {}
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                        
+                        ```
+                  
+                        
          
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
