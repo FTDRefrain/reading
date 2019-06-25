@@ -599,8 +599,6 @@
       }
       ```
    
-      
-   
    3. snabbdom进行VDOM的实现：使用patch(container, newNode)和patch(oldNode, newNode)两种方式；
    
    4. DIFF算法，
