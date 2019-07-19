@@ -239,3 +239,16 @@
    4. PhysicalModel包裹住后进行修饰，如颜色，边角
    5. 不对齐的时候考虑expand一下，使用flex: 1扩展后再看
    6. MediaQuery.of(context)获取屏幕实例
+
+6. 搜索框实现
+
+   1. Color里面要用int.parse解析8位的16进制字符串
+   2. hintText设置提示文字，hintStyle设置提示字体大小
+   3. opacity控制样式变化；或者使用color(opacity * 255)
+   4. 搜索目标高亮显示：用搜索词去分割目标，然后加到list里面，搜索词部分是变色且高亮的；外面一个richText，里面是textSpan -> children将所有内容放进去
+   5. 动画执行过程中长宽改变，使用stack设置同层撑开布局
+
+7. Native集成
+
+   1. 用安卓或者ios去调用native的内容，然后通过混合开发插件去实现通信，做到flutter调用native的方式
+   2. 将两个项目都依赖于一个flutter sdk，且native项目依赖于主项目；
