@@ -152,6 +152,8 @@
 
 7. 测试及优化
 
+8. babel相关：babel-preset-es2015和babel-preset-react是ES6和React编译集
+
 ---
 
 三. vDOM内容相关
@@ -222,4 +224,91 @@
 
 四. Flux架构
 
-1. 
+1. 传统MVC架构，Modal表示数据，V是视图，C则是用户对于数据的操作反映到的视图的控制：一个问题就是当modal和view是多对多的时候，管理混乱
+
+2. MVVM则是数据驱动，将C使用VM进行了替代
+
+3. Flux，本身单向数据流且必须使用dispatch和action配合，保证了数据的统一性
+
+4. Redux结构，flux的升级版
+
+   1. 三个原则：单向数据流，纯函数，状态不可变
+
+   2. 中间件增强redux结构
+
+      1. 核心是compose和dispatch两个函数
+
+      2. compose实现相当于是reduceRight
+
+         ```jsx
+         const compose = (...funcs) => (args) => funcs.reduceRight((composed, f) => f(composed, args))
+         // compose(f1, f2, f3) => f1(f2(f3))
+         ```
+
+      3. 流程：将所有中间件和创建好的store连起来->将修饰过的store传入到每一个中间件里面->compose将形成的链式中间件和`store.dispatch`连在一起作为新的dispatch->将dispatch和构建的store一起返回
+
+      4. 不同：`store.dispatch`是调用就从头开始，next则是一直往里走
+
+   3. 构建方式如下
+
+      ```jsx
+      const middlewareDemo = ({dispatch, getState}) => next => action => {
+        notMatch() ? next(action) : doSomething()
+      }
+      ```
+
+   4. 多异步串联：使用reduce和Promise的then配合实现
+
+      ```jsx
+      const multiAsync = ({dispatch, getState}) => next => action => {
+        return action.reduce((result, currentAction)=>{
+          result.then(()=>{
+            return Array.isArray(currentAction) ? Promise.all(currentAction.map(i => dispatch(i)) : dispatch(currentAction)
+          })
+        }, Promise.resolve())
+      }
+      ```
+
+5. 路由相关
+
+   1. hashChange和history.putState两种方式
+
+   2. 使用react-router-redux将router里面的信息也放到store里面
+
+   3. 本身是一个组件，最后渲染的时候就是这个组件挂到目标上
+
+      ```jsx
+      const routes = (
+        <Route history={hashHistory}>
+          <Route path='/' component={Home} />
+        </Route>
+      )
+      ReactDom.render(routes, document.getElementById('root'))
+      ```
+
+6. 组件形式：容器组件（即使用children作为内容）；view组件，本身提供布局；smart组件，本身负责数据和方法
+
+7. 例子
+
+   1. webpack里面的dev-server启动一个server而不是file协议解析文件；`content-base`参数使得本地路径访问静态文件成为可能
+   2. 导航里面使用nav标签，语义化一下
+   3. Redux里面的applyMiddleware添加了扩展性
+
+8. Redux高阶使用
+
+   1. 高阶reducer
+      1. 首先是actionType，一定要全局唯一，自定义根据文件路径去加prefix，进行一个包裹。这样逻辑就可以复用了
+      2. 表单数据绑定，验证
+   2. 一次性的，非持久化的数据抽离出去，不适用redux保存。例如模态框
+   3. 源码解析相关
+   4. connect解析
+
+---
+
+五. SSR
+
+1. 没有细讲
+
+---
+
+六. 可视化问题
