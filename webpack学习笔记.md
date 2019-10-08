@@ -238,7 +238,7 @@
 
       1. chunks，进行代码分割；'async'是只负责异步加载的代码，'all'表示同步和异步的都有
 
-      2. cacheGroup：具体结构如下
+      2. cacheGroup：具体结构如下，filename指定打包的名字，不指定就是`vendors~main.js`，是群聚名字；automaticNameDelimiter指定文件中间分隔符名字；
 
          ```jsx
          cacheGroup:{
@@ -250,4 +250,4 @@
          }
          ```
 
-         
+      3. 
