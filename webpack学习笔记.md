@@ -238,7 +238,7 @@
 
       1. chunks，进行代码分割；'async'是只负责异步加载的代码，'all'表示同步和异步的都有
 
-      2. cacheGroup：具体结构如下，filename指定打包的名字，不指定就是`vendors~main.js`，是群聚名字；automaticNameDelimiter指定文件中间分隔符名字；
+      2. cacheGroup：具体结构如下，filename指定打包的名字，不指定就是`vendors~main.js`，是群聚名字，即一个规则匹配的压缩到一个群组里面；automaticNameDelimiter指定文件中间分隔符名字；default指定的是其他文件;本身是对chunks规则的一个补充
 
          ```jsx
          cacheGroup:{
@@ -246,8 +246,102 @@
          		test:/[\\/]node_modules[\\/]/,
          		priority:-10,
          		filename:'vendors.js',
-         	}
+         	}，
+           default:{}
          }
-         ```
+```
+         
+      3. 参数相关解释
+      
+         1. minSize指定的是，小于这个值的包就不进行代码分割了；
+         2. maxSize则是打包出来的文件进行二次分割；
+         3. minChunks：即引入几次才进行代码分割
+         4. maxAsyncRequests: 即最高的请求数限制，打包出来的文件多于这个参数就不进行分割了；
+         5. maxInitialRequests：即首页的引入文件数量
+         6. Name: true即表示cacheGroups里面的名字有效
+         7. cacheGroup: 即符合要求的先不打包，先分配组，然后文件扫完之后才进行打包；解决的是想多个文件打包到一个里面的情况；
+         8. Priority：即各组的优先级
+         9. reuseExistingChunk：true；因为存在一个包已经放到group里面，但是另外group使用到了，这时候就不用放进去，而是直接使用另一个组的包就行
+   
+4. 懒加载
 
-      3. 
+   1. 本身就是异步加载的形式
+
+   2. 必须使用polyfill去注入Promise实现异步的方式
+
+   3. 使用方式的样例
+
+      ```jsx
+      async function getEle = () => {
+        const {default:_} = await import(/*webpackChunkName:"lodash"*/ './lodash');
+        return _
+      }
+      getEle.then(_ => log(_))
+      ```
+
+5.  分析和优化
+
+   1. 分析工具:`webpack/analyse`工具直接进行分析
+   2. `--profile --json`生成一个打包文件的描述
+   3. 或者在code split -> bundle analysis找到对应的分析工具
+   4. Prefetching
+      1. Chrome里面使用cmd+shift+P进行命令查找，然后调出coverage，进行屏幕操作的录制
+      2. 考虑的是代码的使用率，希望首屏时候代码使用率更高
+      3. 提出的一个思想就是交互产生的内容变成异步加载，也就是webpack推荐的chunks: async的原因，即异步加载的去split才有效果；而现在可以做到网络带宽有限制的时候就去加载；
+      4. 通过`import(/*webpackPrefetch:true* './click.js'/).then`的方式进行prefetch标签的注入
+      5. 可能在浏览器会有兼容的问题
+   5. Preload：即和主业务文件一起进行加载
+
+6. CSS文件
+
+   1. Output -> chunkNames，指定的是entry以外引入文件打包之后的名字
+   2. Mini-css-extract-plugin，本来CSS是在js文件里面，希望还是样式抽离出去
+   3. 首先是rules里面的`loader: MiniCSSExtractPlugin.loader`，然后注意配置package.json里面的sideEffects字段，避免tree-shaking将内容刷掉
+   4. 在plugin里面则是进行打包名字的配置，同样直接引入进filename，间接的进chunkFileName
+   5. Optimization-css-assets-webpack-plugin，进行样式的压缩和合并
+   6. cacheGroup里面可以额外配置，结合官网文档看；
+
+7. 浏览器缓存文件的问题
+
+   1. 打包出来的文件名字没有加hash的话，web访问时候默认走缓存；
+
+   2. 老版本里面，可能存在没有更新但是打包出来的文件hash内容不同的情况。采用如下的配置
+
+      ```jsx
+      optimization: {runtimeChunk: {name: 'runtime'}}
+      ```
+
+   3. 上面的配置放到新版本也可以
+
+   4. Runtime: 逻辑和第三方库的关系放在mainfest里面，本身写在打包之后的文件里面，这个内容可能会发生改变，使用上面的配置，mainfest放到了runtime文件里面，这样就不会发生失效
+
+8. Shimming，垫片的思想
+
+   1. 一个问题是，本身是模块化编写和打包，这样每个文件都要进行引入，哪怕变量是全局的也不行。即如$, _这样的虽然全局注入，但是不能用
+
+   2. 自己的可以加import，第三方就没有办法，解决方案如下；且可以指定方法，如_join代表的是lodash.join
+
+      ```jsx
+      new Webpack.ProvidePlugin({
+        $: 'jquery'，
+        _join: ['lodash', 'join'],
+      })
+      ```
+
+   3. 模块里面的this不是window，改变指向的方式如下
+
+      ```jsx
+      loader: 'imports-loader?this=>window'
+      ```
+
+   4. 即shimming的思想就是人为的修改或者做一些修饰
+
+9. 环境变量
+
+   1. `wenpack --env.production=true`的方式进行参数的传递，然后配合下面的方式，进行config的配置和导出
+
+      ```jsx
+      module.exports = env => env.production
+      ```
+
+      
