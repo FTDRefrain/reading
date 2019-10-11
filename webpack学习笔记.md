@@ -539,4 +539,30 @@
    4. compilation里面进行操作；异步的周期使用`tapAsync`且之后要cb往下走；同步周期则是使用`tap`注入内容，且没有cb；
    5. `node --inspect --inspect-brk node_modules/webpack/bin/webpack.js`开启node的调试模式，通过web可以进行断点调试；`debugger`关键字手动打断点；
 3. bundler
-   1. 
+   1. `fs.readFileSync`读取文件
+   2. `@babel/parser`进入babel里面的ast分析工具，然后`parser.parse`获取到ast内容
+   3. 使用`@babel/tarverse`进行ast的遍历，获取到目的节点，得到文件的依赖
+   4. `@babel/tarnsformFromAst`将ast根据`presets`做一次语法转译，然后变成代码
+   5. 代码生成部分，因为只是进行了语法的转译，本身client还是做不了；通过闭包的方式实现，里面注意两点，一个是实现require方法，一个是声明exports，且要实现相对转换成绝对路径
+   6. 通过eval执行代码
+
+---
+
+## 脚手架内容，通过看脚手架学习webpack配置
+
+1. `CreateReactApp`脚手架，配置更灵活
+   1. 线上环境
+      1. `eject`弹出配置
+      2. `[].filter(Boolean)`将前面所有的false都滤掉；
+      3. `devtoolModuleFilenameTemplate`帮助定位sourceMap真正位置，从而帮助调错
+      4. `TerserPlugin`负责进行线上环境js代码的压缩
+      5. `resolve: plugin`里面依旧可以配置插件，即引入模块的时候额外进行一些操作
+      6. `oneOf`字段，即文件匹配到一个loader就停止匹配了
+      7. scss和sass本身都是有支持的
+      8. 做了一些大小名字写错依旧能引入包的操作
+   2. 开发环境：主要的`webpack-devServer`的配置
+2. `Vue-CLI 3`脚手架相关，配置更简单
+   1. 本身没有eject的过程
+   2. 采用的是`vue.config.js`结合自己官网的api进行自定义配置
+   3. 在`vue-cli-service-lib-config`里面进行了自己参数和webpack参数的转换；
+   4. `configureWebpack`直接去写webpack配置，本身是调用`webpack-merge`进行了融合；
