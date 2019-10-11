@@ -344,4 +344,199 @@
       module.exports = env => env.production
       ```
 
-      
+---
+
+## 实战内容相关
+
+1. Library
+
+   1. 自己构建库：使用package.json配置内容，设置下面的参数；直接pro模式打包文件
+
+      ```jsx
+      output: {library: 'root', libraryTarget:'umd'}
+      ```
+
+   2. 通过library指定全局注入变量的名字，umd的方式适配所有的包引入的情况
+
+   3. externals字段配置一些不需要的包，即第三方不希望打包其他的第三方库，避免重复打包的方式，配置如下，指定引入的名字
+
+      ```jsx
+      externals: {lodash: 'lodash'}
+      ```
+
+   4. npm注册账号，`npm adduser`然后进行'npm publish'之后实现包的打包发布；
+
+2. PWA配置相关，即离线访问
+
+   1. `http-server`进行服务器的开启，指定文件或者文件夹都可以；
+
+   2. chrome里面在application里面，service worker配置项进行缓存的清除；
+
+   3. `workbox-webpack-plugin`进行PWA的配置，具体如下；之后生成了precache和service-worker文件
+
+      ```jsx
+      new Workbox.GenerateSW({
+        clientClaim: true,
+        skipWaiting:true,
+      })
+      ```
+
+   4. 配置结束要加上业务代码，具体如下
+
+      ```jsx
+      if('serviceWorker' in navigator){
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-rigester.js')
+            .then(r => {
+            	func()
+          }).catch(e => log(e))
+        })
+      }
+      ```
+
+3. TypeScript打包配置，本身是要安装使用的；
+
+   1. 后缀是tsx，`loader: ts-loader`
+
+   2. 构建tsconfig.js文件进行相关的设置，简单示例如下；即指定打包文件，模块引入方式，导出方式和是否许可引入js；
+
+      ```jsx
+      {
+        "compilerOptions":{
+          "outDir": "./dist",
+          "module": "es6",
+          "target": "es5",
+          "allowJs": true
+        }
+      }
+      ```
+
+   3. `@types/lodash`安装后是在ts里面使用lodash也进行方法和类型的检验
+
+   4. 对应库的类型文件要去搜索安装才可以配合ts使用；
+
+4. DevServer实现请求分发
+
+   1. 因为开发时候url不固定，为了方便之后的更改采用的是相对路径
+
+   2. 一个方式是采用charles或者fiddler进行代理服务器转发请求的方式进行设置
+
+   3. 可以去配置devServer，例子如下；根路径`/`的代理默认是不支持的，要额外配置`index: ''`才可以
+
+      ```jsx
+      proxy: {
+        'proxy/api': {
+          target: 'http://proxy.server.api',
+          pathRewrite: {'header.json': 'demo.json'}
+        }
+      }
+      ```
+
+   4. 上面做到了：实现访问代理；路径重写
+
+   5. 本身的devServer针对的是开发环境
+
+   6. https的代理要额外配置`secure: false`才行
+
+   7. 可以使用bypass字段进行请求修饰或者拦截，后面跟的是func
+
+   8. `changeOrigion: true`，因为有的web会做域名访问限制，这个字段能突破限制
+
+   9. 本身是基于`http-proxy-middleware`这个中间件；有很多的配置，且直接在`proxy`字段下面进行配置，如`headers`相关字段
+
+5. devServer解决SPA路由问题，这种方式仅开发时候有效，线上还是要用nginx或者apache修改
+
+   1. React-router-dom实现SPA路由；使用brower的方式，一个问题是单页面应用是只有index.html的，所以直接访问如`host://123`的页面是找不到123这个文件的
+   2. 配置如下`devServer: {historyApiFallback: true} `，就是所有的api都打回/
+   3. 本身底层使用`connect-history-api-fallback`写的，还有一些rewrite字段，进行动态路由的转发
+
+6. EsLint在webpack中的配置
+
+   1. 安装后`npx eslint --init`进行配置，本身可以使用流行，自己设置，文件导入三种方式
+   2. 流行里面，有airbnb, standard, google三种方案，一般是第一种
+   3. 生成的位置在eslintrc.js文件里面
+   4. 对于react的配置要额外多加一个jsx解析，配置如下`parser: babel-eslint`
+   5. 不同的规范，设置rules字段，根据IDE提供的规范名字进行指定，变成0就是直接去掉
+   6. 全局变量的问题`globals: {document: false}`就可以使用全局变量了；
+   7. webpack里面借助loader实现，改变rules字段，`rules: {use : ['bable-loader', 'eslint-loader']}`
+   8. devServer里面设置`overlay: true`这样，打包过程的错误会直接显示到网页上面，避免了IDE插件无法加入的影响； 
+   9. 里面可以使用`force: 'pre'`进行loader的优先级强制提高
+
+7. webpack优化方案
+
+   1. 提高node, npm, yarn版本的更新
+
+   2. 尽可能少的模块上面使用loader；
+
+      1. 一种方式是`include: path.resolve(__dirname, '../src')`即指定文件夹
+
+   3. 明确plugin的使用环境，如压缩，开发不用发行使用
+
+   4. 使用官网推荐的插件，效率可以得到保证
+
+   5. 对jsx做兼容，即`/\.jsx?$/`的方式
+
+   6. resolve的作用`extensions: ['.js', '.jsx']`即自己进行扩展名的引入；本身基于node的文件系统，有性能损耗
+
+   7. resolve另一个作用是`mainFiles: ['index', 'child']`对于文件夹的引入直接去找index然后再找child
+
+   8. 设置alias进行路径的设置
+
+   9. 上面的resolve就不要使用，因为耗性能
+
+   10. 希望第三方库在开发时候只有第一次打包
+
+       1. 可以将第三方库提前打包好，如下配置生成了dll文件以及mainfest用来之后开发环境下的dll缓存；library目的是全局注入，方便之后的import；
+
+          ```jsx
+          entry: {vendors: ['react', 'react-dom', 'lodash']},
+          output: {
+            filename: '[name].dll.js',
+            path: path.resolve(__dirname, '../dll'),
+            library: '[name]'
+          },
+          plugins: {
+            new webpack.DllPlugin({
+              name: '[name]',
+              path: path.resolve(__dirname, '../dll/[name].mainfest.json'),
+            })
+          }
+          ```
+
+       2. 然后使用`add-asset-html-webpack-plugin`帮助引入一些静态文件，将上面打包出来的vendors.js文件注入到index模板里面
+
+       3. `new webpack.DllReferencePlugin({mainfest: path.resolve('./vendors.mainfest.json')})`，这样在import的时候，发现全局变量有且有mainfest依赖，就不会重复打包而是直接使用
+
+       4. 原来的方式是将第三方库都打包放到了cacheGroup里面
+
+   11. 控制包大小，主要就是tree-shaking
+
+   12. 多进程打包：`thread-loader`, `parallel-webpack`, `happypack`三种方式
+
+   13. sourceMap的合理配置来优化
+
+   14. 线上工具进行stat分析进行优化
+
+   15. 开发环境的内容编译，没用插件剔除
+
+8. 多页面打包
+
+   1. 核心就是通过html-webpack-plugin不断的注入模板，通过chunks指定引入文件的名字
+   2. 具体代码也是遍历文件然后注入；
+
+---
+
+## 底层原理相关
+
+1. loader编写
+   1. 使用`loader-utils`进行参数的获取，一定是function这样，因为会有this绑定的问题
+   2. `resolveLoader`进行loader查找路径
+   3. `callback = this.async()`进行异步操作的声明
+2. plugin编写
+   1.  本身是类，通过`constructor(options)`获取到出入的参数
+   2. `apply(compiler)`定义操作方法
+   3. `compiler.hook`调用不同时段的钩子，找文档确定操作的时间
+   4. compilation里面进行操作；异步的周期使用`tapAsync`且之后要cb往下走；同步周期则是使用`tap`注入内容，且没有cb；
+   5. `node --inspect --inspect-brk node_modules/webpack/bin/webpack.js`开启node的调试模式，通过web可以进行断点调试；`debugger`关键字手动打断点；
+3. bundler
+   1. 
