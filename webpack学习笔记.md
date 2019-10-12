@@ -338,7 +338,7 @@
 
 9. 环境变量
 
-   1. `wenpack --env.production=true`的方式进行参数的传递，然后配合下面的方式，进行config的配置和导出
+   1. `webpack --env.production=true`的方式进行参数的传递，然后配合下面的方式，进行config的配置和导出
 
       ```jsx
       module.exports = env => env.production
@@ -542,7 +542,7 @@
    1. `fs.readFileSync`读取文件
    2. `@babel/parser`进入babel里面的ast分析工具，然后`parser.parse`获取到ast内容
    3. 使用`@babel/tarverse`进行ast的遍历，获取到目的节点，得到文件的依赖
-   4. `@babel/tarnsformFromAst`将ast根据`presets`做一次语法转译，然后变成代码
+   4. `@babel/transformFromAst`将ast根据`presets`做一次语法转译，然后变成代码
    5. 代码生成部分，因为只是进行了语法的转译，本身client还是做不了；通过闭包的方式实现，里面注意两点，一个是实现require方法，一个是声明exports，且要实现相对转换成绝对路径
    6. 通过eval执行代码
 
