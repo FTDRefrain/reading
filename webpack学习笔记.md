@@ -544,6 +544,9 @@
    3. 使用`@babel/tarverse`进行ast的遍历，获取到目的节点，得到文件的依赖
       1. 采用的是访问者模式，这样一次遍历，该节点位置的方法都能调用
       2. 接受的是Path对象，包括节点名字，以及entry和exit两个时间点
+      3. 更改ast的时候，使用的是`path.replaceWith(rtn)`这样也确保DFS的正常；数组的替换使用`path.replaceWithMultiple(array)`；
+      4. 里面还可以`path.traverse`的方式进行递归调用；
+      5. scope记录的是环境上下文，`path.scope.generateUid()`生成唯一标识符用于之后绑定；`path.scope.getBinding`获取到binding上下文，即参数绑定
    4. `@babel/transformFromAst`将ast根据`presets`做一次语法转译，然后变成代码
    5. 代码生成部分，因为只是进行了语法的转译，本身client还是做不了；通过闭包的方式实现，里面注意两点，一个是实现require方法，一个是声明exports，且要实现相对转换成绝对路径
    6. 通过eval执行代码
